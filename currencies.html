@@ -1,0 +1,106 @@
+<!doctype html:5>
+<html>
+  <head>
+    <title>Currency Exchange Rates</title>
+    <meta http-equiv="Cache-control" content="private" />
+    <script
+			  src="https://code.jquery.com/jquery-3.6.0.min.js"
+			  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous">
+      </script>
+      <script>
+        const currencyNames = ["usd", "eur", "aud", "cad", "chf", "nzd", "bgn"];
+
+        $(document).ready(
+          function() {
+            $(".groupLabel").hide();
+            $(".countLabel").hide();
+            
+            $("#currencyNames").click(
+              function() {
+                const SERVICE_URL_TEMPLATE = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/SRC/TRG.json"
+                const cn = $(this).val().toLowerCase();
+                const serviceUrlSrc = SERVICE_URL_TEMPLATE.replace("SRC", cn);
+                let group1Count = 0;
+                let group2Count = 0;
+                let group3Count = 0;
+
+                $(".rates").empty();
+                $(".count").text("0");
+
+                for (let i = 0; i < currencyNames.length; i++) {
+                  if (currencyNames[i] !== cn) {
+                    let serviceUrlTrg = serviceUrlSrc.replace("TRG", currencyNames[i]);
+
+                    $.get(serviceUrlTrg, function(data, status) {
+                      const rate = Number(data[currencyNames[i]]);
+                      let listItem = "<li>" + currencyNames[i].toUpperCase() + ":" + rate + "</li>";
+
+                      if (rate < 1.0) {
+                        $("#group1").append(listItem);
+                        $("#group1Count").text(++group1Count);
+
+                        $("#groupLabel1").show();
+                        $("#countLabel1").show();
+                        $("#group1Count").show();
+                      }
+                      else if (rate >= 1.0 && rate < 1.5) {
+                        $("#group2").append(listItem);
+                        $("#group2Count").text(++group2Count);
+
+                        $("#groupLabel2").show();
+                        $("#countLabel2").show();
+                        $("#group2Count").show();
+                      }
+                      else {
+                        $("#group3").append(listItem);
+                        $("#group3Count").text(++group3Count);
+
+                        $("#groupLabel3").show();
+                        $("#countLabel3").show();
+                        $("#group3Count").show();
+                      }
+                    });
+                  }
+                }
+              }
+            )
+          }
+        );
+      </script>
+      <style>
+        .countLabel {
+          margin-bottom: 5px;
+          margin-left: 20px;
+          visibility: none;
+        }
+
+        .groupLabel {
+          visibility: none;
+        }
+      </style>
+  </head>
+  <body>
+    <h3>Currency Exchange Rates</h3>
+    <select name="currencyNames" id="currencyNames">
+      <option value="USD" selected>USD</option>
+      <option value="EUR">EUR</option>
+      <option value="AUD">AUD</option>
+      <option value="CAD">CAD</option>                
+      <option value="CHF">CHF</option>               
+      <option value="NZD">NZD</option>
+      <option value="BGN">BGN</option>
+    </select>
+    <div>
+      <div id="groupLabel1" class="groupLabel">Group 1</div>
+      <ul name="group1" id="group1" class="rates"></ul>
+      <div id="countLabel1" class="countLabel">Count: <span id="group1Count" class="count"></span></div>
+      <div id="groupLabel2" class="groupLabel">Group 2</div>
+      <ul name="group2" id="group2" class="rates"></ul>
+      <div id="countLabel2" class="countLabel">Count: <span id="group2Count" class="count"></span></div>
+      <div id="groupLabel3" class="groupLabel">Group 3</div>
+      <ul name="group3" id="group3" class="rates"></ul>
+      <div id="countLabel3" class="countLabel">Count: <span id="group3Count" class="count"></span></div>
+    </div>
+  </body>
+</html>
